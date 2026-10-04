@@ -1,0 +1,25 @@
+{
+  "keys": [
+    {
+      "id": "示例-id-1",
+      "platform": "deepseek",
+      "key": "sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+      "label": "示例：DeepSeek 主号",
+      "createdAt": 0
+    },
+    {
+      "id": "示例-id-2",
+      "platform": "bailian",
+      "key": "AccessKeyID|AccessKeySecret",
+      "label": "示例：阿里云百炼",
+      "createdAt": 0
+    },
+    {
+      "id": "示例-id-3",
+      "platform": "tencent",
+      "key": "SecretId|SecretKey",
+      "label": "示例：腾讯云混元",
+      "createdAt": 0
+    }
+  ]
+}

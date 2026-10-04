@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Token Monitor - 全平台AI余额监控</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app">
+    <!-- 顶部导航 -->
+    <header class="header">
+      <div class="header-content">
+        <div class="logo">
+          <div class="logo-icon">💰</div>
+          <div class="logo-text">
+            <h1>Token Monitor</h1>
+            <p>全平台AI Token余额监控</p>
+          </div>
+        </div>
+        <div class="header-actions">
+          <button class="btn btn-refresh" id="refreshBtn" onclick="refreshAllBalances()">
+            <span class="icon">🔄</span>
+            刷新余额
+          </button>
+          <button class="btn btn-settings" onclick="toggleAlertSettings()">
+            <span class="icon">⚙️</span>
+            告警设置
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <main class="main">
+      <!-- 概览统计 -->
+      <section class="overview-section">
+        <div class="overview-cards">
+          <div class="overview-card total">
+            <div class="card-label">总余额</div>
+            <div class="card-value" id="totalBalance">¥ 0.00</div>
+            <div class="card-sub">所有平台合计</div>
+          </div>
+          <div class="overview-card platforms">
+            <div class="card-label">已接入平台</div>
+            <div class="card-value" id="platformCount">0</div>
+            <div class="card-sub">个平台</div>
+          </div>
+          <div class="overview-card keys">
+            <div class="card-label">API Key</div>
+            <div class="card-value" id="keyCount">0</div>
+            <div class="card-sub">个密钥</div>
+          </div>
+          <div class="overview-card warning">
+            <div class="card-label">余额告警</div>
+            <div class="card-value" id="alertStatus">未开启</div>
+            <div class="card-sub" id="alertThreshold">阈值: ¥10</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 添加Key面板 -->
+      <section class="add-key-section">
+        <div class="section-header">
+          <h2>添加 API Key</h2>
+          <p>添加您的AI平台API Key以监控余额</p>
+        </div>
+        <div class="add-key-form">
+          <div class="form-group">
+            <label for="platformSelect">选择平台</label>
+            <select id="platformSelect" onchange="updatePlatformInfo()">
+              <option value="">加载中...</option>
+            </select>
+          </div>
+          <div class="form-group" id="apiKeyGroup">
+            <label for="apiKeyInput">API Key</label>
+            <input type="password" id="apiKeyInput" placeholder="请输入您的API Key">
+          </div>
+          <div class="form-group" id="accessKeyIdGroup" style="display: none;">
+            <label for="accessKeyIdInput">AccessKey ID</label>
+            <input type="text" id="accessKeyIdInput" placeholder="请输入AccessKey ID">
+          </div>
+          <div class="form-group" id="accessKeySecretGroup" style="display: none;">
+            <label for="accessKeySecretInput">AccessKey Secret</label>
+            <input type="password" id="accessKeySecretInput" placeholder="请输入AccessKey Secret">
+          </div>
+          <div class="form-group">
+            <label for="keyLabel">备注名称（可选）</label>
+            <input type="text" id="keyLabel" placeholder="例如：工作号、个人号">
+          </div>
+          <div class="form-group form-submit">
+            <button class="btn btn-primary" onclick="addApiKey()">添加 Key</button>
+          </div>
+        </div>
+        <div class="platform-info" id="platformInfo"></div>
+      </section>
+
+      <!-- 余额列表 -->
+      <section class="balance-section">
+        <div class="section-header">
+          <h2>余额监控</h2>
+          <div class="section-actions">
+            <span class="last-update" id="lastUpdate">尚未刷新</span>
+            <label class="auto-refresh">
+              <input type="checkbox" id="autoRefreshCheck" onchange="toggleAutoRefresh()">
+              自动刷新 (5分钟)
+            </label>
+          </div>
+        </div>
+        <div class="balance-grid" id="balanceGrid">
+          <div class="empty-state" id="emptyState">
+            <div class="empty-icon">🔑</div>
+            <h3>还没有添加任何API Key</h3>
+            <p>添加您的第一个API Key开始监控余额</p>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- 告警设置弹窗 -->
+    <div class="modal-overlay" id="alertModal" style="display: none;">
+      <div class="modal">
+        <div class="modal-header">
+          <h3>告警设置</h3>
+          <button class="modal-close" onclick="toggleAlertSettings()">✕</button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="checkbox-label">
+              <input type="checkbox" id="alertEnabledCheck">
+              开启余额告警
+            </label>
+          </div>
+          <div class="form-group">
+            <label for="alertThresholdInput">告警阈值（元）</label>
+            <input type="number" id="alertThresholdInput" min="0" step="1" value="10">
+            <p class="form-hint">当任一平台余额低于此值时，页面会显示红色警告</p>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" onclick="toggleAlertSettings()">取消</button>
+          <button class="btn btn-primary" onclick="saveAlertSettings()">保存</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toast 提示 -->
+    <div class="toast-container" id="toastContainer"></div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
