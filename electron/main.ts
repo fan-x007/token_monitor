@@ -12,20 +12,29 @@ let currentShortcut: string = ''
 let recordingShortcut = false
 let recordConfirmTimer: NodeJS.Timeout | null = null
 
-// Token monitor SVG icon for tray
-const TRAY_ICON_SVG = `
-<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-  <circle cx="12" cy="12" r="10"/>
-  <path d="M12 6v6l4 2"/>
-  <path d="M2 12h2M20 12h2M12 2v2M12 20v2"/>
-</svg>
-`
+// 获取托盘图标路径（开发时从 build 目录，打包后从 resources 目录）
+function getTrayIconPath(): string {
+  if (app.isPackaged) {
+    return path.join(process.resourcesPath, 'tray.png')
+  }
+  return path.join(__dirname, '../build/tray.png')
+}
+
+// 获取应用图标路径
+function getAppIconPath(): string {
+  if (app.isPackaged) {
+    return path.join(process.resourcesPath, 'icon.png')
+  }
+  return path.join(__dirname, '../build/icon.png')
+}
 
 function createTrayIcon() {
   try {
-    const img = nativeImage.createFromDataURL(
-      'data:image/svg+xml;base64,' + Buffer.from(TRAY_ICON_SVG).toString('base64')
-    )
+    const iconPath = getTrayIconPath()
+    const img = nativeImage.createFromPath(iconPath)
+    if (img.isEmpty()) {
+      return nativeImage.createEmpty()
+    }
     return img.resize({ width: 16, height: 16 })
   } catch {
     return nativeImage.createEmpty()
@@ -99,6 +108,7 @@ function createWindow() {
     alwaysOnTop: true,
     skipTaskbar: true,
     show: false,
+    icon: getAppIconPath(),
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,

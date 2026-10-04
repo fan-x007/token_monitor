@@ -12,6 +12,7 @@ dist-ssr/
 *.local
 release/
 build/
+!build/icon.svg
 out/
 
 # ============================================================
