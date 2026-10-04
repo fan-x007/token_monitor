@@ -110,10 +110,13 @@ npm run dist
 
 ## 🔒 数据安全
 
-- 所有 API Key 都保存在本地 `userData` 目录下（`%APPDATA%\Token Monitor\token-keys.json`）
+- **本地加密存储**：所有 API Key 使用 **AES-256-GCM** 加密后保存在本地，密钥与本机绑定，文件即使被拷走也无法解密
+- 存储位置：`%APPDATA%\Token Monitor\token-keys.json`（加密存储）
+- 机器密钥：首次运行生成并保存在 `%APPDATA%\Token Monitor\.machine-key`
 - 不会上传到任何服务器
-- 只有调用各平台官方余额查询接口时才会使用 Key
+- 只有调用各平台官方余额查询接口时才会使用 Key（内存中解密）
 - 项目目录本身不存储任何真实密钥，`server/data/config.json` 已加入 `.gitignore`
+- 旧版本未加密的数据会在首次加载时自动迁移为加密格式
 
 ## 🛠️ 技术实现
 

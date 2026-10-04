@@ -1,6 +1,7 @@
 import * as fs from 'fs'
 import * as path from 'path'
 import { app } from 'electron'
+import { encrypt, decrypt, isEncrypted } from './crypto'
 
 export interface BalanceData {
   isAvailable: boolean
@@ -65,6 +66,17 @@ export class TokenStore {
         const data = fs.readFileSync(this.filePath, 'utf-8')
         const parsed = JSON.parse(data)
         this.keys = Array.isArray(parsed) ? parsed : []
+        // 解密所有 key 字段，并自动迁移未加密的旧数据
+        this.keys.forEach(k => {
+          if (k.key && isEncrypted(k.key)) {
+            try {
+              k.key = decrypt(k.key)
+            } catch {
+              k.key = ''
+            }
+          }
+          // 旧数据未加密则保持原样（内存中明文，保存时自动加密）
+        })
       }
     } catch (e) {
       console.error('Failed to load token keys:', e)
@@ -74,7 +86,12 @@ export class TokenStore {
 
   private save() {
     try {
-      fs.writeFileSync(this.filePath, JSON.stringify(this.keys, null, 2), 'utf-8')
+      // 保存时加密 key 字段
+      const encryptedKeys = this.keys.map(k => ({
+        ...k,
+        key: k.key ? encrypt(k.key) : '',
+      }))
+      fs.writeFileSync(this.filePath, JSON.stringify(encryptedKeys, null, 2), 'utf-8')
     } catch (e) {
       console.error('Failed to save token keys:', e)
     }
