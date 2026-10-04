@@ -49,6 +49,7 @@ interface AppSettings {
   toggleShortcut: string
   alertThreshold: number
   autoRefresh: boolean
+  uiScale: number
 }
 
 function App() {
@@ -58,6 +59,7 @@ function App() {
     toggleShortcut: 'CommandOrControl+Shift+T',
     alertThreshold: 10,
     autoRefresh: true,
+    uiScale: 1,
   })
   const [selectedPlatform, setSelectedPlatform] = useState('')
   const [apiKey, setApiKey] = useState('')
@@ -116,6 +118,11 @@ function App() {
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [])
+
+  // 应用界面缩放
+  useEffect(() => {
+    document.body.style.zoom = String(settings.uiScale)
+  }, [settings.uiScale])
 
   const formatShortcutDisplay = (accelerator: string): string => {
     return accelerator
@@ -260,6 +267,16 @@ function App() {
       await window.tokenApi?.setAutoRefresh(newVal)
       setSettings(s => ({ ...s, autoRefresh: newVal }))
       showToast(newVal ? '已开启自动刷新' : '已关闭自动刷新')
+    } catch (e) {
+      showToast('设置失败', 'error')
+    }
+  }
+
+  const handleSaveUiScale = async (scale: number) => {
+    try {
+      await window.tokenApi?.setUiScale(scale)
+      setSettings(s => ({ ...s, uiScale: scale }))
+      showToast(`界面缩放已调整为 ${Math.round(scale * 100)}%`)
     } catch (e) {
       showToast('设置失败', 'error')
     }
@@ -507,6 +524,21 @@ function App() {
                 />
                 <span className="slider"></span>
               </label>
+            </div>
+
+            <div className="form-group">
+              <label>界面缩放：{Math.round(settings.uiScale * 100)}%</label>
+              <div className="scale-buttons">
+                {[0.6, 0.7, 0.8, 0.9, 1, 1.1, 1.2, 1.4, 1.6].map(scale => (
+                  <button
+                    key={scale}
+                    className={`scale-btn ${settings.uiScale === scale ? 'active' : ''}`}
+                    onClick={() => handleSaveUiScale(scale)}
+                  >
+                    {Math.round(scale * 100)}%
+                  </button>
+                ))}
+              </div>
             </div>
 
             <div className="platform-info" style={{ marginTop: 12 }}>

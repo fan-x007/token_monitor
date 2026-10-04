@@ -46,6 +46,7 @@ export interface AppSettings {
   toggleShortcut: string
   alertThreshold: number
   autoRefresh: boolean
+  uiScale: number
 }
 
 export class TokenStore {
@@ -130,6 +131,7 @@ export class SettingsStore {
       toggleShortcut: 'CommandOrControl+Shift+T',
       alertThreshold: 10,
       autoRefresh: true,
+      uiScale: 1,
     }
     this.load()
   }
@@ -182,6 +184,15 @@ export class SettingsStore {
 
   setAutoRefresh(enabled: boolean): void {
     this.settings.autoRefresh = enabled
+    this.save()
+  }
+
+  getUiScale(): number {
+    return this.settings.uiScale
+  }
+
+  setUiScale(scale: number): void {
+    this.settings.uiScale = Math.max(0.5, Math.min(2, scale))
     this.save()
   }
 }

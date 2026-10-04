@@ -330,7 +330,7 @@ function registerIpcHandlers() {
 
   // Settings handlers
   ipcMain.handle('get-settings', () => {
-    const s = settingsStore?.get() || { toggleShortcut: 'CommandOrControl+Shift+T', alertThreshold: 10, autoRefresh: true }
+    const s = settingsStore?.get() || { toggleShortcut: 'CommandOrControl+Shift+T', alertThreshold: 10, autoRefresh: true, uiScale: 1 }
     if (!isValidAccelerator(s.toggleShortcut)) {
       s.toggleShortcut = 'CommandOrControl+Shift+T'
     }
@@ -348,6 +348,15 @@ function registerIpcHandlers() {
 
   ipcMain.handle('set-auto-refresh', (_event, enabled: boolean) => {
     settingsStore?.setAutoRefresh(enabled)
+    return true
+  })
+
+  ipcMain.handle('get-ui-scale', () => {
+    return settingsStore?.getUiScale() || 1
+  })
+
+  ipcMain.handle('set-ui-scale', (_event, scale: number) => {
+    settingsStore?.setUiScale(scale)
     return true
   })
 }

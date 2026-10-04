@@ -44,6 +44,7 @@ export interface AppSettings {
   toggleShortcut: string
   alertThreshold: number
   autoRefresh: boolean
+  uiScale: number
 }
 
 export const tokenApi = {
@@ -76,6 +77,8 @@ export const tokenApi = {
   setToggleShortcut: (shortcut: string): Promise<boolean> => ipcRenderer.invoke('set-toggle-shortcut', shortcut),
   setAlertThreshold: (threshold: number): Promise<boolean> => ipcRenderer.invoke('set-alert-threshold', threshold),
   setAutoRefresh: (enabled: boolean): Promise<boolean> => ipcRenderer.invoke('set-auto-refresh', enabled),
+  getUiScale: (): Promise<number> => ipcRenderer.invoke('get-ui-scale'),
+  setUiScale: (scale: number): Promise<boolean> => ipcRenderer.invoke('set-ui-scale', scale),
 }
 
 contextBridge.exposeInMainWorld('tokenApi', tokenApi)
