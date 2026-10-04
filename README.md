@@ -13,6 +13,7 @@
 - **系统托盘常驻** — 后台静默运行，托盘图标显示总余额
 - **余额告警** — 可设置阈值，余额偏低时红色高亮提醒
 - **自动刷新** — 每 5 分钟自动刷新所有余额
+- **界面缩放** — 支持 60%~160% 共 9 档界面缩放，字号大小自由调节
 - **快速充值** — 每个平台卡片直达充值页面
 - **本地存储** — API Key 存在本地，不上传任何服务器
 - **多 Key 管理** — 同一个平台可以添加多个 Key，支持备注名称
@@ -39,10 +40,9 @@
 
 ## 📦 安装
 
-### 环境要求
+### 下载安装包
 
-- Node.js >= 18
-- Windows / macOS / Linux
+从 [GitHub Releases](https://github.com/fan-x007/token_monitor/releases) 下载最新的 `Token-Monitor-x.x.x-setup.exe`，双击安装即可。
 
 ### 开发运行
 
@@ -102,6 +102,7 @@ npm run dist
 - **唤醒快捷键**：点击录制框，按下想要的组合键，300ms 后自动确认
 - **余额告警阈值**：余额低于此值时卡片红色高亮
 - **自动刷新**：开关自动刷新（每 5 分钟）
+- **界面缩放**：调整界面大小，支持 60%~160% 共 9 档，即点即生效
 
 ### 4. 快速充值
 
@@ -113,6 +114,48 @@ npm run dist
 - 不会上传到任何服务器
 - 只有调用各平台官方余额查询接口时才会使用 Key
 - 项目目录本身不存储任何真实密钥，`server/data/config.json` 已加入 `.gitignore`
+
+## 🛠️ 技术实现
+
+### 技术栈
+
+| 类别 | 技术 | 用途 |
+|------|------|------|
+| 框架 | **Electron** | 跨平台桌面应用 |
+| 前端 | **React 18 + TypeScript** | 渲染进程 UI |
+| 构建 | **Vite** | 前端构建工具 |
+| 打包 | **electron-builder** | 生成 EXE/MSI 安装包 |
+| 图标 | **sharp** + SVG | 从 SVG 生成多尺寸 PNG 图标 |
+
+### 核心指令速查
+
+```bash
+# 安装依赖
+npm install
+
+# 开发模式（热更新 + Electron）
+npm run electron:dev
+
+# 仅编译前端
+npm run build
+
+# 打包 Windows 安装包（NSIS）
+npm run dist:win
+
+# 打包当前平台安装包
+npm run dist
+
+# 生成多尺寸图标（从 build/icon.svg）
+node scripts/generate-icon.js
+```
+
+### 关键实现原理
+
+1. **余额查询**：各平台适配器通过 HTTPS 调用官方开放 API，使用 API Key 鉴权，读取账户余额信息返回统一格式
+2. **全局快捷键**：通过 `globalShortcut` 注册系统级快捷键，录制模式通过 `before-input-event` 捕获按键组合
+3. **本地存储**：数据保存在 `app.getPath('userData')` 下的 JSON 文件中，启动时读取，修改时实时写入
+4. **界面缩放**：通过 CSS `zoom` 属性动态调整整体界面比例，设置持久化到本地
+5. **系统托盘**：使用 `Tray` API 创建托盘图标，Tooltip 显示总余额和可用平台数
 
 ## 📁 项目结构
 
@@ -133,6 +176,11 @@ token_monitor/
 │   ├── App.tsx
 │   ├── main.tsx
 │   └── index.css
+├── scripts/                  # 工具脚本
+│   └── generate-icon.js     # 从 SVG 生成 PNG 图标
+├── build/                    # 构建资源（图标等）
+│   ├── icon.svg             # 图标源文件
+│   └── icon.png             # 生成的图标
 ├── server/                  # 旧版网页服务端（保留参考）
 │   ├── index.js
 │   └── platforms/
